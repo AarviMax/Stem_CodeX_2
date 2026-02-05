@@ -29,6 +29,7 @@ const moods = [
   'happy', 'sad', 'angry', 'surprised', 'neutral', 'sleepy', 'excited', 'stressed',
   'calm', 'confused', 'fearful', 'disgusted', 'bored',
   'depressed', 'anxious', 'frustrated', 'lonely', 'guilty'
+  'calm', 'confused', 'fearful', 'disgusted', 'bored'
 ];
 const languages = ['english', 'hindi', 'kannada', 'bhojpuri', 'malayalam', 'telugu', 'punjabi', 'tamil'];
 
@@ -53,6 +54,10 @@ const moodDescriptions = {
   guilty: 'Constrained smile + unstable eye rhythm indicates possible guilt-like mood.'
 };
 
+  bored: 'Low movement + flat curvature indicates boredom.'
+};
+
+// AI model (small neural net) trained on synthetic feature prototypes for mood classes.
 const moodModel = trainMoodModel();
 const songDb = buildEmbeddedSongDb();
 allMoodsEl.textContent = moods.join(', ');
@@ -247,6 +252,9 @@ function classifyMoodAI(features) {
 function trainMoodModel() {
   const net = new brain.NeuralNetwork({ hiddenLayers: [12, 10], activation: 'relu' });
 
+  const net = new brain.NeuralNetwork({ hiddenLayers: [10, 10], activation: 'relu' });
+
+  // Synthetic prototypes to emulate a small AI mood model.
   const prototypes = {
     happy: [0.62, 0.45, 0.12],
     sad: [0.32, 0.25, 0.65],
@@ -266,11 +274,13 @@ function trainMoodModel() {
     frustrated: [0.64, 0.69, 0.68],
     lonely: [0.22, 0.22, 0.62],
     guilty: [0.34, 0.58, 0.64]
+    bored: [0.24, 0.18, 0.49]
   };
 
   const trainingData = [];
   Object.entries(prototypes).forEach(([mood, p]) => {
     for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 18; i++) {
       const input = {
         eyeAmplitude: clamp(p[0] + jitter(0.06), 0, 1),
         eyeWavelength: clamp(p[1] + jitter(0.08), 0, 1),
@@ -283,6 +293,7 @@ function trainMoodModel() {
 
   net.train(trainingData, {
     iterations: 1400,
+    iterations: 1200,
     log: false,
     errorThresh: 0.012,
     learningRate: 0.03
@@ -361,6 +372,20 @@ function buildEmbeddedSongDb() {
       fearful: 'sTANio_2E0Q', disgusted: 'DWcJFNfaw9c', bored: '3AtDnEC4zak', depressed: 'YykjpeuMNEk', anxious: 'hLQl3WQQoQ0',
       frustrated: 'nfs8NYg7yQM', lonely: 'RgKAFK5djSk', guilty: 'CevxZvSJLk8'
     }
+  const base = {
+    happy: { title: 'Mood Lift Track', videoId: 'ZbZSe6N_BXs' },
+    sad: { title: 'Comfort Piano', videoId: 'ho9rZjlsyYY' },
+    angry: { title: 'Calm Ambient', videoId: '2OEL4P1Rz04' },
+    surprised: { title: 'High Energy', videoId: 'fLexgOxsZu0' },
+    neutral: { title: 'Lo-fi Focus', videoId: 'jfKfPfyJRdk' },
+    sleepy: { title: 'Wake Up Beat', videoId: '09R8_2nJtjg' },
+    excited: { title: 'Party Pulse', videoId: 'kJQP7kiw5Fk' },
+    stressed: { title: 'Stress Relief', videoId: '1ZYbU82GVz4' },
+    calm: { title: 'Deep Calm', videoId: 'UfcAVejslrU' },
+    confused: { title: 'Think Mode', videoId: '5qap5aO4i9A' },
+    fearful: { title: 'Grounding Sound', videoId: 'sTANio_2E0Q' },
+    disgusted: { title: 'Reset Mood', videoId: 'DWcJFNfaw9c' },
+    bored: { title: 'Fresh Vibes', videoId: '3AtDnEC4zak' }
   };
 
   const db = {};
@@ -372,6 +397,10 @@ function buildEmbeddedSongDb() {
       db[lang][mood] = {
         title: `${capitalize(lang)} ${mood} recommendation`,
         videoId
+      const item = base[mood] || base.neutral;
+      db[lang][mood] = {
+        title: `${capitalize(lang)} ${item.title}`,
+        videoId: item.videoId
       };
     }
   }
