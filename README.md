@@ -2,13 +2,10 @@
 
 A local web app that:
 - Uses webcam face landmarks (MediaPipe FaceMesh).
-- Uses an in-browser **AI mood model** (small neural network via Brain.js) to classify mood from:
-  - eye amplitude
-  - eye wavelength
-  - mouth curvature
+- Estimates mood from **eye amplitude**, **eye wavelength**, and **mouth curvature**.
 - Performs lightweight face recognition (user pattern match).
 - Supports language selection: Hindi, English, Kannada, Bhojpuri, Malayalam, Telugu, Punjabi, Tamil.
-- Recommends songs using **embedded YouTube links** (iframe), not raw MP3 URLs.
+- Recommends and plays mood-based songs.
 - Includes **Start Scanning** and **Stop Scanning** controls.
 
 ## Run on localhost
@@ -17,22 +14,8 @@ A local web app that:
 python3 -m http.server 8000
 ```
 
-Open:
+Then open:
 
 `http://localhost:8000`
-
-## Kill localhost server
-
-If you launched the server in background:
-
-```bash
-pkill -f "python3 -m http.server 8000"
-```
-
-Or kill by port:
-
-```bash
-kill -9 $(lsof -ti:8000)
-```
 
 > Allow webcam permission in the browser.
