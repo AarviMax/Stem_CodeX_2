@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MoodWave - Face Mood Music Player</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="bg-glow"></div>
+  <main class="app-shell">
+    <header>
+      <h1>MoodWave AI</h1>
+      <p>Face Recognition + Eye/Mouth Signal Mood Analysis + Multilingual Music</p>
+    </header>
+
+    <section class="scanner-card glass">
+      <div class="video-wrap">
+        <video id="webcam" autoplay playsinline muted></video>
+        <canvas id="overlay"></canvas>
+        <div class="scan-status" id="scanStatus">Idle</div>
+      </div>
+
+      <div class="actions">
+        <button id="startScanBtn" class="btn primary">Start Scanning</button>
+        <button id="stopScanBtn" class="btn danger" disabled>Stop Scanning</button>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric"><span>Face</span><strong id="faceIdentity">Not recognized</strong></div>
+        <div class="metric"><span>Eye Amplitude</span><strong id="eyeAmplitude">-</strong></div>
+        <div class="metric"><span>Eye Wavelength</span><strong id="eyeWavelength">-</strong></div>
+        <div class="metric"><span>Mouth Curvature</span><strong id="mouthCurvature">-</strong></div>
+        <div class="metric mood"><span>Detected Mood</span><strong id="detectedMood">Unknown</strong></div>
+      </div>
+
+      <div class="analysis glass-soft" id="moodAnalysis">
+        Start scan to generate mood analysis.
+      </div>
+    </section>
+
+    <section class="music-card glass">
+      <h2>Language + Song Recommendation</h2>
+      <div class="controls-row">
+        <label for="languageSelect">Choose Language</label>
+        <select id="languageSelect">
+          <option value="english">English</option>
+          <option value="hindi">Hindi</option>
+          <option value="kannada">Kannada</option>
+          <option value="bhojpuri">Bhojpuri</option>
+          <option value="malayalam">Malayalam</option>
+          <option value="telugu">Telugu</option>
+          <option value="punjabi">Punjabi</option>
+          <option value="tamil">Tamil</option>
+        </select>
+        <button id="playSongBtn" class="btn primary">Play Mood Song</button>
+      </div>
+
+      <div class="now-playing" id="nowPlaying">No song selected yet.</div>
+      <audio id="audioPlayer" controls></audio>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+  <script src="script.js"></script>
+</body>
+</html>
