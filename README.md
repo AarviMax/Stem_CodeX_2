@@ -8,9 +8,6 @@ A local web app that:
   - mouth curvature
 - Performs lightweight face recognition (user pattern match).
 - Supports language selection: Hindi, English, Kannada, Bhojpuri, Malayalam, Telugu, Punjabi, Tamil.
-- Recommends songs using **embedded YouTube links** (iframe), not raw MP3 URLs, with language-specific mappings.
-- Includes **Start Scanning** and **Stop Scanning** controls.
-- Supports both positive and negative moods (e.g., stressed, depressed, anxious, lonely, frustrated, guilty).
 - Recommends songs using **embedded YouTube links** (iframe), not raw MP3 URLs.
 - Includes **Start Scanning** and **Stop Scanning** controls.
 
