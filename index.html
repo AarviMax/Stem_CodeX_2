@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MoodWave AI - Smart Mood to Music</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="mesh-bg"></div>
+
+  <main class="layout">
+    <header class="hero glass">
+      <h1>MoodWave AI Studio</h1>
+      <p>AI mood model + face landmarks + multilingual embedded music recommendations</p>
+    </header>
+
+    <section class="left-panel glass">
+      <h2>Face Scanner</h2>
+      <div class="video-wrap compact">
+        <video id="webcam" autoplay playsinline muted></video>
+        <canvas id="overlay"></canvas>
+        <div id="scanStatus" class="scan-status">Idle</div>
+      </div>
+
+      <div class="actions">
+        <button id="startScanBtn" class="btn primary">Start Scanning</button>
+        <button id="stopScanBtn" class="btn danger" disabled>Stop Scanning</button>
+      </div>
+
+      <div class="metric-grid">
+        <article class="metric"><span>Face ID</span><strong id="faceIdentity">Not recognized</strong></article>
+        <article class="metric"><span>Eye Amplitude</span><strong id="eyeAmplitude">-</strong></article>
+        <article class="metric"><span>Eye Wavelength</span><strong id="eyeWavelength">-</strong></article>
+        <article class="metric"><span>Mouth Curvature</span><strong id="mouthCurvature">-</strong></article>
+        <article class="metric highlight"><span>Detected Mood</span><strong id="detectedMood">Unknown</strong></article>
+      </div>
+    </section>
+
+    <section class="right-panel glass">
+      <h2>Mood Analysis + Music</h2>
+      <div class="analysis" id="moodAnalysis">Start scan to generate AI mood analysis.</div>
+
+      <div class="controls-row">
+        <label for="languageSelect">Language</label>
+        <select id="languageSelect">
+          <option value="english">English</option>
+          <option value="hindi">Hindi</option>
+          <option value="kannada">Kannada</option>
+          <option value="bhojpuri">Bhojpuri</option>
+          <option value="malayalam">Malayalam</option>
+          <option value="telugu">Telugu</option>
+          <option value="punjabi">Punjabi</option>
+          <option value="tamil">Tamil</option>
+        </select>
+        <button id="playSongBtn" class="btn primary">Load Embedded Song</button>
+      </div>
+
+      <div class="now-playing" id="nowPlaying">No embedded recommendation yet.</div>
+      <div class="embed-wrap">
+        <iframe
+          id="songEmbed"
+          title="Mood song recommendation"
+          src="https://www.youtube.com/embed/jfKfPfyJRdk"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen>
+        </iframe>
+      </div>
+
+      <details class="moods-list">
+        <summary>Supported moods</summary>
+        <p id="allMoods"></p>
+      </details>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/brain.js@2.0.0-beta.2/dist/brain-browser.min.js" crossorigin="anonymous"></script>
+  <script src="script.js"></script>
+</body>
+</html>
