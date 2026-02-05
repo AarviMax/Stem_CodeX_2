@@ -27,7 +27,8 @@ let baselineEmbedding = null;
 
 const moods = [
   'happy', 'sad', 'angry', 'surprised', 'neutral', 'sleepy', 'excited', 'stressed',
-  'calm', 'confused', 'fearful', 'disgusted', 'bored'
+  'calm', 'confused', 'fearful', 'disgusted', 'bored',
+  'depressed', 'anxious', 'frustrated', 'lonely', 'guilty'
 ];
 const languages = ['english', 'hindi', 'kannada', 'bhojpuri', 'malayalam', 'telugu', 'punjabi', 'tamil'];
 
@@ -44,10 +45,14 @@ const moodDescriptions = {
   confused: 'Uneven activity with uncertain mouth profile suggests confusion.',
   fearful: 'High alert-eye pattern with constrained smile suggests fearfulness.',
   disgusted: 'Tight upper-lip profile with irregular eye response suggests disgust.',
-  bored: 'Low movement + flat curvature indicates boredom.'
+  bored: 'Low movement + flat curvature indicates boredom.',
+  depressed: 'Very low facial-energy profile suggests a depressed affect state.',
+  anxious: 'High micro-variability in eye signal indicates anxious state.',
+  frustrated: 'Tension-heavy profile with uneven mouth movement indicates frustration.',
+  lonely: 'Muted expression with low engagement suggests loneliness.',
+  guilty: 'Constrained smile + unstable eye rhythm indicates possible guilt-like mood.'
 };
 
-// AI model (small neural net) trained on synthetic feature prototypes for mood classes.
 const moodModel = trainMoodModel();
 const songDb = buildEmbeddedSongDb();
 allMoodsEl.textContent = moods.join(', ');
@@ -240,9 +245,8 @@ function classifyMoodAI(features) {
 }
 
 function trainMoodModel() {
-  const net = new brain.NeuralNetwork({ hiddenLayers: [10, 10], activation: 'relu' });
+  const net = new brain.NeuralNetwork({ hiddenLayers: [12, 10], activation: 'relu' });
 
-  // Synthetic prototypes to emulate a small AI mood model.
   const prototypes = {
     happy: [0.62, 0.45, 0.12],
     sad: [0.32, 0.25, 0.65],
@@ -256,12 +260,17 @@ function trainMoodModel() {
     confused: [0.55, 0.55, 0.57],
     fearful: [0.8, 0.84, 0.58],
     disgusted: [0.48, 0.63, 0.75],
-    bored: [0.24, 0.18, 0.49]
+    bored: [0.24, 0.18, 0.49],
+    depressed: [0.18, 0.16, 0.78],
+    anxious: [0.7, 0.93, 0.6],
+    frustrated: [0.64, 0.69, 0.68],
+    lonely: [0.22, 0.22, 0.62],
+    guilty: [0.34, 0.58, 0.64]
   };
 
   const trainingData = [];
   Object.entries(prototypes).forEach(([mood, p]) => {
-    for (let i = 0; i < 18; i++) {
+    for (let i = 0; i < 20; i++) {
       const input = {
         eyeAmplitude: clamp(p[0] + jitter(0.06), 0, 1),
         eyeWavelength: clamp(p[1] + jitter(0.08), 0, 1),
@@ -273,7 +282,7 @@ function trainMoodModel() {
   });
 
   net.train(trainingData, {
-    iterations: 1200,
+    iterations: 1400,
     log: false,
     errorThresh: 0.012,
     learningRate: 0.03
@@ -292,30 +301,77 @@ function playMoodSong() {
 }
 
 function buildEmbeddedSongDb() {
-  const base = {
-    happy: { title: 'Mood Lift Track', videoId: 'ZbZSe6N_BXs' },
-    sad: { title: 'Comfort Piano', videoId: 'ho9rZjlsyYY' },
-    angry: { title: 'Calm Ambient', videoId: '2OEL4P1Rz04' },
-    surprised: { title: 'High Energy', videoId: 'fLexgOxsZu0' },
-    neutral: { title: 'Lo-fi Focus', videoId: 'jfKfPfyJRdk' },
-    sleepy: { title: 'Wake Up Beat', videoId: '09R8_2nJtjg' },
-    excited: { title: 'Party Pulse', videoId: 'kJQP7kiw5Fk' },
-    stressed: { title: 'Stress Relief', videoId: '1ZYbU82GVz4' },
-    calm: { title: 'Deep Calm', videoId: 'UfcAVejslrU' },
-    confused: { title: 'Think Mode', videoId: '5qap5aO4i9A' },
-    fearful: { title: 'Grounding Sound', videoId: 'sTANio_2E0Q' },
-    disgusted: { title: 'Reset Mood', videoId: 'DWcJFNfaw9c' },
-    bored: { title: 'Fresh Vibes', videoId: '3AtDnEC4zak' }
+  const languageDefaults = {
+    english: 'dQw4w9WgXcQ',
+    hindi: 'JGwWNGJdvx8',
+    kannada: '6vKucgAeF_Q',
+    bhojpuri: 'wWlYU0P2b4E',
+    malayalam: 'hQ9Q1K0Gx8I',
+    telugu: 'kJQP7kiw5Fk',
+    punjabi: 'i3m8U3jjo0o',
+    tamil: 'YQHsXMglC9A'
+  };
+
+  const languageMoodVideos = {
+    english: {
+      happy: 'ZbZSe6N_BXs', sad: 'ho9rZjlsyYY', angry: '2OEL4P1Rz04', surprised: 'fLexgOxsZu0', neutral: 'jfKfPfyJRdk',
+      sleepy: '09R8_2nJtjg', excited: 'kJQP7kiw5Fk', stressed: '1ZYbU82GVz4', calm: 'UfcAVejslrU', confused: '5qap5aO4i9A',
+      fearful: 'sTANio_2E0Q', disgusted: 'DWcJFNfaw9c', bored: '3AtDnEC4zak', depressed: 'RgKAFK5djSk', anxious: 'hLQl3WQQoQ0',
+      frustrated: 'CevxZvSJLk8', lonely: 'YykjpeuMNEk', guilty: 'nfs8NYg7yQM'
+    },
+    hindi: {
+      happy: 'JGwWNGJdvx8', sad: 'ho9rZjlsyYY', angry: '2OEL4P1Rz04', surprised: 'fLexgOxsZu0', neutral: 'jfKfPfyJRdk',
+      sleepy: '09R8_2nJtjg', excited: '3AtDnEC4zak', stressed: '1ZYbU82GVz4', calm: 'UfcAVejslrU', confused: '5qap5aO4i9A',
+      fearful: 'sTANio_2E0Q', disgusted: 'DWcJFNfaw9c', bored: 'ZbZSe6N_BXs', depressed: 'YykjpeuMNEk', anxious: 'hLQl3WQQoQ0',
+      frustrated: 'nfs8NYg7yQM', lonely: 'RgKAFK5djSk', guilty: 'CevxZvSJLk8'
+    },
+    kannada: {
+      happy: '6vKucgAeF_Q', sad: 'YykjpeuMNEk', angry: 'nfs8NYg7yQM', surprised: 'fLexgOxsZu0', neutral: 'jfKfPfyJRdk',
+      sleepy: '09R8_2nJtjg', excited: '3AtDnEC4zak', stressed: '1ZYbU82GVz4', calm: 'UfcAVejslrU', confused: '5qap5aO4i9A',
+      fearful: 'sTANio_2E0Q', disgusted: 'DWcJFNfaw9c', bored: 'ZbZSe6N_BXs', depressed: 'ho9rZjlsyYY', anxious: 'hLQl3WQQoQ0',
+      frustrated: 'CevxZvSJLk8', lonely: 'RgKAFK5djSk', guilty: '2OEL4P1Rz04'
+    },
+    bhojpuri: {
+      happy: 'wWlYU0P2b4E', sad: 'YykjpeuMNEk', angry: '2OEL4P1Rz04', surprised: 'fLexgOxsZu0', neutral: 'jfKfPfyJRdk',
+      sleepy: '09R8_2nJtjg', excited: 'kJQP7kiw5Fk', stressed: '1ZYbU82GVz4', calm: 'UfcAVejslrU', confused: '5qap5aO4i9A',
+      fearful: 'sTANio_2E0Q', disgusted: 'DWcJFNfaw9c', bored: '3AtDnEC4zak', depressed: 'RgKAFK5djSk', anxious: 'hLQl3WQQoQ0',
+      frustrated: 'nfs8NYg7yQM', lonely: 'ho9rZjlsyYY', guilty: 'CevxZvSJLk8'
+    },
+    malayalam: {
+      happy: 'hQ9Q1K0Gx8I', sad: 'ho9rZjlsyYY', angry: '2OEL4P1Rz04', surprised: 'fLexgOxsZu0', neutral: 'jfKfPfyJRdk',
+      sleepy: '09R8_2nJtjg', excited: 'kJQP7kiw5Fk', stressed: '1ZYbU82GVz4', calm: 'UfcAVejslrU', confused: '5qap5aO4i9A',
+      fearful: 'sTANio_2E0Q', disgusted: 'DWcJFNfaw9c', bored: '3AtDnEC4zak', depressed: 'YykjpeuMNEk', anxious: 'hLQl3WQQoQ0',
+      frustrated: 'nfs8NYg7yQM', lonely: 'RgKAFK5djSk', guilty: 'CevxZvSJLk8'
+    },
+    telugu: {
+      happy: 'kJQP7kiw5Fk', sad: 'ho9rZjlsyYY', angry: '2OEL4P1Rz04', surprised: 'fLexgOxsZu0', neutral: 'jfKfPfyJRdk',
+      sleepy: '09R8_2nJtjg', excited: '3AtDnEC4zak', stressed: '1ZYbU82GVz4', calm: 'UfcAVejslrU', confused: '5qap5aO4i9A',
+      fearful: 'sTANio_2E0Q', disgusted: 'DWcJFNfaw9c', bored: 'ZbZSe6N_BXs', depressed: 'YykjpeuMNEk', anxious: 'hLQl3WQQoQ0',
+      frustrated: 'nfs8NYg7yQM', lonely: 'RgKAFK5djSk', guilty: 'CevxZvSJLk8'
+    },
+    punjabi: {
+      happy: 'i3m8U3jjo0o', sad: 'ho9rZjlsyYY', angry: '2OEL4P1Rz04', surprised: 'fLexgOxsZu0', neutral: 'jfKfPfyJRdk',
+      sleepy: '09R8_2nJtjg', excited: 'kJQP7kiw5Fk', stressed: '1ZYbU82GVz4', calm: 'UfcAVejslrU', confused: '5qap5aO4i9A',
+      fearful: 'sTANio_2E0Q', disgusted: 'DWcJFNfaw9c', bored: '3AtDnEC4zak', depressed: 'YykjpeuMNEk', anxious: 'hLQl3WQQoQ0',
+      frustrated: 'nfs8NYg7yQM', lonely: 'RgKAFK5djSk', guilty: 'CevxZvSJLk8'
+    },
+    tamil: {
+      happy: 'YQHsXMglC9A', sad: 'ho9rZjlsyYY', angry: '2OEL4P1Rz04', surprised: 'fLexgOxsZu0', neutral: 'jfKfPfyJRdk',
+      sleepy: '09R8_2nJtjg', excited: 'kJQP7kiw5Fk', stressed: '1ZYbU82GVz4', calm: 'UfcAVejslrU', confused: '5qap5aO4i9A',
+      fearful: 'sTANio_2E0Q', disgusted: 'DWcJFNfaw9c', bored: '3AtDnEC4zak', depressed: 'YykjpeuMNEk', anxious: 'hLQl3WQQoQ0',
+      frustrated: 'nfs8NYg7yQM', lonely: 'RgKAFK5djSk', guilty: 'CevxZvSJLk8'
+    }
   };
 
   const db = {};
   for (const lang of languages) {
     db[lang] = {};
     for (const mood of moods) {
-      const item = base[mood] || base.neutral;
+      const perLang = languageMoodVideos[lang] || {};
+      const videoId = perLang[mood] || perLang.neutral || languageDefaults[lang] || languageDefaults.english;
       db[lang][mood] = {
-        title: `${capitalize(lang)} ${item.title}`,
-        videoId: item.videoId
+        title: `${capitalize(lang)} ${mood} recommendation`,
+        videoId
       };
     }
   }
